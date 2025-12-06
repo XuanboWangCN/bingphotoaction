@@ -15,6 +15,11 @@ jobs:
       - name: Fetch Bing Photo Info
         run: |
           curl -s https://bingphotoapi.xuanbo.top/info > photo.json
+          if [ ! -s photo.json ]; then
+            echo "Error: Failed to fetch photo.json"
+            exit 1
+          fi
+          cat photo.json
 
       - name: Update photos.json
         run: |
