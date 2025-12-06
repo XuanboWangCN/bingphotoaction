@@ -13,7 +13,7 @@ def format_date(date_str):
 def get_image_url(url_base, size):
     """根据尺寸生成图片URL"""
     if size == "uhd":
-        return f"{url_base}_3840x2160.jpg"
+        return f"{url_base}_UHD.jpg"
     else:  # 1080p
         return f"{url_base}_1920x1080.jpg"
 
@@ -29,14 +29,7 @@ def main():
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      background-color: #f8f9fa;
-    }
-    .page-header {
-      margin-bottom: 0.5rem;
-    }
     .page-header h1 {
-      font-size: 1.5rem;
       font-weight: 300;
     }
     .subtitle {
@@ -44,22 +37,10 @@ def main():
       color: #6c757d;
       margin-bottom: 2rem;
     }
-    .card {
-      box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
-      border: none;
-    }
-    .card-img-top {
-      height: 250px;
-      object-fit: cover;
-    }
     .copyright-text {
       font-size: 0.875rem;
       color: #6c757d;
       font-style: italic;
-      margin-top: 0.75rem;
-      padding-top: 0.75rem;
-      border-top: 1px solid #e9ecef;
-      line-height: 1.5;
     }
     footer {
       background-color: #f8f9fa;
@@ -76,17 +57,11 @@ def main():
     footer a:hover {
       text-decoration: underline;
     }
-    .btn-group-vertical {
-      width: 100%;
-    }
-    .btn-group-vertical .btn {
-      text-align: left;
-    }
   </style>
 </head>
 <body>
 <div class="container py-4">
-  <div class="page-header">
+  <div class="page-header mb-4">
     <h1>必应每日一图</h1>
   </div>
   <div class="subtitle">最近三十天</div>
@@ -106,11 +81,11 @@ def main():
         <img src="{photo['url']}" class="card-img-top" alt="{title}">
         <div class="card-body">
           <h5 class="card-title">{title}</h5>
-          <div class="copyright-text">{copyright_text}</div>
-          <div class="btn-group w-100 mt-3" role="group">
-            <a href="{copyright_link}" target="_blank" class="btn btn-sm btn-outline-primary">在必应中搜索详情</a>
+          <p class="card-text">{copyright_text}</p>
+          <div class="btn-group w-100" role="group">
+            <a href="{copyright_link}" target="_blank" class="btn btn-sm btn-primary">在必应中搜索详情</a>
             <div class="btn-group" role="group">
-              <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+              <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
                 下载图片
               </button>
               <ul class="dropdown-menu">
