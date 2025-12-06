@@ -25,9 +25,12 @@ jobs:
           python3 .github/scripts/generate_html.py
 
       - name: Commit and Push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add photos.json index.html
           git commit -m "Update Bing photo for $(date +%Y-%m-%d)" || exit 0
-          git push
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          git push origin HEAD:${GITHUB_REF#refs/heads/}
