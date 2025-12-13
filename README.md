@@ -2,15 +2,17 @@
 
 > 一个完全自动化的解决方案，每日自动采集必应每日一图，永久保存至数据库，并实时生成动态分页网站。
 ## 👁 预览
+
+### 🌍 在线预览
+
+- **Cloudflare Pages**：[https://bingphotoaction.pages.dev/](https://bingphotoaction.pages.dev/)
+- **My website**：[https://bphoto.xuanbo.top/](https://bphoto.xuanbo.top/)
+
 ### bphoto.xuanbo.top 的屏幕截图
 <img src="https://raw.githubusercontent.com/XuanboWangCN/bingphotoaction/refs/heads/main/screenshots.png" 
      alt="bphoto.xuanbo.top的屏幕截图" 
      style="width:50%; height:auto;" 
      title="bphoto.xuanbo.top的屏幕截图">
-### 🌍 在线预览
-
-- **Cloudflare Pages**：[https://bingphotoaction.pages.dev/](https://bingphotoaction.pages.dev/)
-- **My website**：[https://bphoto.xuanbo.top/](https://bphoto.xuanbo.top/)
 
 ## 📋 项目概述
 
@@ -226,6 +228,7 @@ git push origin main
 ❓ **如有任何问题，欢迎[提交Issue](https://github.com/XuanboWangCN/bingphotoaction/issues)反馈或通过邮件联系。**
 
 最后更新：2025年12月14日
+
 
 
 
