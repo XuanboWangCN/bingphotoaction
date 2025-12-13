@@ -31,7 +31,7 @@
 - 🔗 **多分辨率支持**：同时提供1080p和4K (UHD)两种分辨率选项
 
 ### 🌐 网站展示
-- 📄 **分页系统**：每页显示25张照片，支持无限分页浏览
+- 📄 **分页系统**：每页显示12张照片，支持无限分页浏览
 - 📱 **响应式设计**：
   - 4列布局（≥1200px超大屏幕）
   - 3列布局（992-1199px桌面屏幕）
@@ -116,7 +116,7 @@ bingphotoaction/
 2. 必应API调用获取照片数据写入 photo.json
 3. 执行 update_photos.py 增量合并数据至 photos.json
 4. 执行 generate_html.py 生成分页网站HTML及JSON数据
-   - 按25张/页拆分生成分页JSON文件（page-1.json, page-2.json ...）
+   - 按12张/页拆分生成分页JSON文件（page-1.json, page-2.json ...）
    - 输出至 htmlphotosinfojson/ 目录
    - 生成最小化HTML文件，包含客户端渲染脚本
 5. 提交 photos.json、index.html、htmlphotosinfojson/ 至远程仓库
@@ -141,7 +141,7 @@ bingphotoaction/
 ```
 
 ### htmlphotosinfojson/page-{n}.json 结构
-> 客户端优先请求分页JSON，结构与photos.json相同，但只包含该页的12条数据（最后一页可能少于25条）
+> 客户端优先请求分页JSON，结构与photos.json相同，但只包含该页的12条数据（最后一页可能少于12条）
 
 ```json
 [
@@ -152,7 +152,7 @@ bingphotoaction/
 ```
 
 #### 加载策略
-1. **首选**：尝试加载 `htmlphotosinfojson/page-{n}.json`（仅需25条数据）
+1. **首选**：尝试加载 `htmlphotosinfojson/page-{n}.json`（仅需12条数据）
 2. **回退**：若404则加载完整 `photos.json`，在客户端切割该页数据
 3. **优势**：大幅减少带宽占用，特别是在数据集很大时提升加载速度
 
@@ -228,6 +228,7 @@ git push origin main
 ❓ **如有任何问题，欢迎[提交Issue](https://github.com/XuanboWangCN/bingphotoaction/issues)反馈或通过邮件联系。**
 
 最后更新：2025年12月14日
+
 
 
 
