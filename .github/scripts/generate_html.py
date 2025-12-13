@@ -4,7 +4,7 @@ from datetime import datetime
 
 PHOTOS_JSON = "photos.json"
 HTML_FILE = "index.html"
-PHOTOS_PER_PAGE = 25
+PHOTOS_PER_PAGE = 12
 PAGE_JSON_DIR = "htmlphotosinfojson"
 PAGE_JSON_TEMPLATE = os.path.join(PAGE_JSON_DIR, "page-{n}.json")
 
@@ -308,4 +308,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
