@@ -34,69 +34,86 @@
     footer a:hover {
       text-decoration: underline;
     }
-    .pagination {
-      margin-top: 2rem;
-      justify-content: center;
-    }
     .page-info {
       text-align: center;
-      margin-top: 1rem;
       font-size: 0.875rem;
       color: #6c757d;
+      margin: 2rem 0;
     }
-    
-    /* 卡片优化 */
-    .card {
-      display: flex;
-      flex-direction: column;
-    }
-    .card-body {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    .card-text {
-      flex: 1;
-      margin-bottom: 1rem;
-    }
-    
-    /* 按钮组优化 */
     .btn-action-group {
       display: flex;
       gap: 0.5rem;
-      width: 100%;
     }
     .btn-bing-wrapper {
       flex: 2;
-      display: flex;
+    }
+    .btn-bing-wrapper .btn {
+      width: 100%;
     }
     .btn-download-wrapper {
       flex: 1;
+    }
+    .card {
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+    .card-img-top {
+      object-fit: cover;
+      height: 200px;
+    }
+    .card-title {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #212529;
+    }
+    .card-text {
+      font-size: 0.875rem;
+      color: #6c757d;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+    .card-footer {
+      background-color: #f8f9fa;
+      border-top: 1px solid #dee2e6;
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+    }
+    .photo-page {
       display: flex;
-    }
-    .btn-download-wrapper .btn,
-    .btn-bing-wrapper .btn {
+      flex-wrap: wrap;
       width: 100%;
-      font-size: 0.75rem;
-      padding: 0.4rem 0.5rem;
+      gap: 1rem;
     }
-    .btn-group-vertical .btn-group,
-    .btn-bing-wrapper .btn-group {
-      width: 100%;
+    .photo-page .col {
+      flex: 0 0 calc(33.333333% - 0.67rem);
     }
-    .btn-bing-wrapper .dropdown-toggle::after {
-      margin-left: 0.25rem;
+    @media (max-width: 991.98px) {
+      .photo-page .col {
+        flex: 0 0 calc(50% - 0.5rem);
+      }
+    }
+    @media (max-width: 767.98px) {
+      .photo-page .col {
+        flex: 0 0 100%;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container py-4">
-  <div class="page-header mb-4">
-    <h1>必应每日一图</h1>
-  </div>
-  <div class="subtitle">全部图片 (共 8 张)</div>
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-    <div class="photo-page" id="page-1" style="display: block;">
+    <div class="page-header mb-4">
+      <h1>必应每日一图</h1>
+    </div>
+    <div class="subtitle">全部图片 (共 8 张)</div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div class="photo-page" id="page-1">
       <div class="col">
         <div class="card h-100">
           <img src="https://www.bing.com/th?id=OHR.YosemiteWinter_ZH-CN3824387818_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp" class="card-img-top" alt="冰封的倒影">
@@ -322,27 +339,25 @@
         </div>
       </div>
     </div>
+    </div>
 
-  </div>
-
-  <!-- 分页导航 -->
-  <nav>
-    <ul class="pagination">
-      <li class="page-item disabled">
-        <a class="page-link" href="?page=1" tabindex="-1" aria-disabled="true">上一页</a>
-      </li>
+    <!-- 分页导航 -->
+    <nav>
+      <ul class="pagination">
+        <li class="page-item disabled">
+          <a class="page-link" href="?page=1" tabindex="-1" aria-disabled="true">上一页</a>
+        </li>
       <li class="page-item active"><a class="page-link" href="?page=1">1</a></li>
+        <li class="page-item disabled">
+          <a class="page-link" href="?page=1" tabindex="-1" aria-disabled="true">下一页</a>
+        </li>
+      </ul>
+    </nav>
 
-      <li class="page-item disabled">
-        <a class="page-link" href="?page=1" tabindex="-1" aria-disabled="true">下一页</a>
-      </li>
-    </ul>
-  </nav>
-
-  <div class="page-info">
-    第 1 / 1 页 (每页显示 25 张)
+    <div class="page-info">
+      第 1 / 1 页 (每页显示 25 张)
+    </div>
   </div>
-</div>
 
 <footer>
   <div class="container text-center">
@@ -356,7 +371,7 @@
   // 解析URL查询参数获取当前页码
   function getCurrentPage() {
     const params = new URLSearchParams(window.location.search);
-    let page = parseInt(params.get('page')) || 1;
+    let page = parseInt(params.get("page")) || 1;
     const maxPage = 1;
     if (page < 1) page = 1;
     if (page > maxPage) page = maxPage;
@@ -366,18 +381,18 @@
   // 页面加载时显示对应页面的内容
   function showPage(page) {
     // 隐藏所有页面内容
-    const allPages = document.querySelectorAll('.photo-page');
-    allPages.forEach(p => p.style.display = 'none');
+    const allPages = document.querySelectorAll(".photo-page");
+    allPages.forEach(p => p.style.display = "none");
     
     // 显示当前页面内容
-    const currentPageDiv = document.getElementById('page-' + page);
+    const currentPageDiv = document.getElementById("page-" + page);
     if (currentPageDiv) {
-      currentPageDiv.style.display = 'block';
+      currentPageDiv.style.display = "flex";
     }
   }
 
   // 初始化
-  window.addEventListener('load', function() {
+  window.addEventListener("load", function() {
     const page = getCurrentPage();
     showPage(page);
   });
