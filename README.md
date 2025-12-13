@@ -211,7 +211,7 @@ git push origin main
 |--------|------|------|
 | 项目主站 | [bingphotoaction.pages.dev](https://bingphotoaction.pages.dev/) | 完整功能展示 |
 | 备用镜像 | [bphoto.xuanbo.top](https://bphoto.xuanbo.top/) 
-| API接口 | [API文档](https://bingphotoapi.xuanbo.top/info) | 必应照片API |
+| API接口 | [bingphotoapi.xuanbo.top/info](https://bingphotoapi.xuanbo.top/info) | 必应照片信息API |
 | 源代码仓库 | [GitHub仓库](https://github.com/XuanboWangCN/bingphotoaction) | 源代码托管 |
 
 ---
@@ -221,5 +221,6 @@ git push origin main
 ❓ **如有任何问题，欢迎[提交Issue](https://github.com/XuanboWangCN/bingphotoaction/issues)反馈或通过邮件联系。**
 
 最后更新：2025年12月14日
+
 
 
