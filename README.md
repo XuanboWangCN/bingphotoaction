@@ -31,14 +31,18 @@
   - 2列布局（768-991px平板设备）
   - 1列布局（<768px移动设备）
 - 🎨 **界面设计**：基于Bootstrap 5.3.3框架，采用现代简洁的卡片设计风格
-- ⚡ **动态导航**：支持页码按钮、上一页/下一页导航，当前页面实时高亮显示
+- ⚡ **动态导航**：支持页码按钮、上一页/下一页导航，当前页面实时高亮显示（最多9个按钮窗口）
 - 🔽 **便捷操作**：集成图片下载和必应搜索快捷按钮
+- ⚙️ **客户端渲染**：采用Vanilla JavaScript动态渲染，无需服务端处理分页逻辑
+- 🚀 **智能加载**：分页JSON按需加载，加载失败自动回退至完整数据库
 
 ### 🔍 用户体验优化
 - 🖱️ **流畅交互**：点击页码实时切换内容，无需刷新页面
 - 🔗 **位置记忆**：通过URL查询参数(`?page=N`)保存浏览位置
 - 📝 **元数据展示**：完整显示图片标题、版权信息和发布日期
 - 💾 **一键下载**：直接链接到官方1080p和4K版本资源
+- 🖼️ **图片懒加载**：采用IntersectionObserver API，仅在图片进入视口时加载高分辨率图像
+- ⚡ **性能优化**：通过分页JSON拆分减少单次加载数据量，显著提升大数据集下的加载速度
 
 ## 🛠️ 技术栈
 
@@ -80,12 +84,16 @@
 bingphotoaction/
 ├── .github/
 │   ├── scripts/
-│   │   ├── generate_html.py      # HTML生成脚本
+│   │   ├── generate_html.py      # HTML生成脚本（生成分页JSON）
 │   │   └── update_photos.py       # 照片数据更新脚本
 │   └── workflows/
 │       └── fetch-bing-photo.yml   # GitHub Action工作流
-├── index.html                     # 生成的网站
-├── photos.json                    # 照片数据库
+├── htmlphotosinfojson/
+│   ├── page-1.json               # 第1页照片数据
+│   ├── page-2.json               # 第2页照片数据
+│   └── ...                        # 更多分页数据
+├── index.html                     # 生成的网站（客户端渲染）
+├── photos.json                    # 完整照片数据库（备份及回退）
 └── README.md                      # 项目说明
 ```
 
@@ -100,8 +108,11 @@ bingphotoaction/
 1. 代码库检出与环境准备
 2. 必应API调用获取照片数据写入 photo.json
 3. 执行 update_photos.py 增量合并数据至 photos.json
-4. 执行 generate_html.py 生成分页网站HTML
-5. 提交更改并推送至远程仓库
+4. 执行 generate_html.py 生成分页网站HTML及JSON数据
+   - 按25张/页拆分生成分页JSON文件（page-1.json, page-2.json ...）
+   - 输出至 htmlphotosinfojson/ 目录
+   - 生成最小化HTML文件，包含客户端渲染脚本
+5. 提交 photos.json、index.html、htmlphotosinfojson/ 至远程仓库
 ```
 
 ## 📊 数据结构示例
@@ -121,6 +132,22 @@ bingphotoaction/
   }
 ]
 ```
+
+### htmlphotosinfojson/page-{n}.json 结构
+> 客户端优先请求分页JSON，结构与photos.json相同，但只包含该页的25条数据（最后一页可能少于25条）
+
+```json
+[
+  { "title": "...", "copyright": "...", "startDate": "...", "url": "...", ... },
+  { "title": "...", "copyright": "...", "startDate": "...", "url": "...", ... },
+  ...（共25条或更少）
+]
+```
+
+#### 加载策略
+1. **首选**：尝试加载 `htmlphotosinfojson/page-{n}.json`（仅需25条数据）
+2. **回退**：若404则加载完整 `photos.json`，在客户端切割该页数据
+3. **优势**：大幅减少带宽占用，特别是在数据集很大时提升加载速度
 
 ## 🎨 功能详解
 
@@ -193,4 +220,4 @@ git push origin main
 
 ❓ **如有任何问题，欢迎[提交Issue](https://github.com/XuanboWangCN/bingphotoaction/issues)反馈或通过邮件联系。**
 
-最后更新：2025年12月13日
+最后更新：2025年12月14日
