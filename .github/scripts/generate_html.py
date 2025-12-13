@@ -1,9 +1,12 @@
 import json
+import os
 from datetime import datetime
 
 PHOTOS_JSON = "photos.json"
 HTML_FILE = "index.html"
 PHOTOS_PER_PAGE = 25
+PAGE_JSON_DIR = "htmlphotosinfojson"
+PAGE_JSON_TEMPLATE = os.path.join(PAGE_JSON_DIR, "page-{n}.json")
 
 def format_date(date_str):
     """将 20251205 格式转换为 2025/12/05"""
@@ -19,21 +22,33 @@ def get_image_url(url_base, size):
         return url_base + "_1920x1080.jpg"
 
 def main():
+    # 确保目录存在
+    if not os.path.exists(PAGE_JSON_DIR):
+        os.makedirs(PAGE_JSON_DIR)
+    
     with open(PHOTOS_JSON, "r", encoding="utf-8") as f:
         photos = json.load(f)
 
     # 计算总页数
     total_pages = (len(photos) + PHOTOS_PER_PAGE - 1) // PHOTOS_PER_PAGE
 
-    # 为每一页生成内容
+    # 为每一页生成单独的 page-{n}.json，便于客户端按需请求
     photos_html_by_page = {}
+    # 确保输出目录存在
+    os.makedirs(PAGE_JSON_DIR, exist_ok=True)
+
     for page_num in range(1, total_pages + 1):
         start_idx = (page_num - 1) * PHOTOS_PER_PAGE
         end_idx = start_idx + PHOTOS_PER_PAGE
         page_photos = photos[start_idx:end_idx]
-        
+
+        # 写入单页 JSON 文件到指定目录
+        page_json_path = PAGE_JSON_TEMPLATE.format(n=page_num)
+        with open(page_json_path, 'w', encoding='utf-8') as pj:
+            json.dump(page_photos, pj, ensure_ascii=False, indent=2)
+
+        # 仍保留 HTML 分块（仅用于在不支持 JS 的环境或回退使用）
         page_html = '    <div class="photo-page" id="page-' + str(page_num) + '">\n'
-        
         for photo in page_photos:
             date_formatted = format_date(photo.get("startDate", ""))
             title = photo.get("title", "")
@@ -41,7 +56,7 @@ def main():
             copyright_link = photo.get("copyrightLink", "#")
             url_base = photo.get("urlBase", "")
             photo_url = photo.get("url", "")
-            
+
             page_html += '      <div class="col">\n'
             page_html += '        <div class="card h-100">\n'
             page_html += '          <img src="' + photo_url + '" class="card-img-top" alt="' + title + '">\n'
@@ -68,7 +83,7 @@ def main():
             page_html += '          </div>\n'
             page_html += '        </div>\n'
             page_html += '      </div>\n'
-        
+
         page_html += '    </div>\n'
         photos_html_by_page[page_num] = page_html
 
@@ -194,26 +209,18 @@ def main():
     html += '    <div class="page-header mb-4">\n'
     html += '      <h1>必应每日一图相册</h1>\n'
     html += '    </div>\n'
-    html += '    <div class="subtitle">已保存来自必应的 ' + str(len(photos)) + ' 张图片</div>\n'
+    html += '    <div class="subtitle" id="summary">正在加载照片信息…</div>\n'
     html += '    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">\n'
-    html += all_photos_html
+    html += '      <div id="gallery" class="photo-page"></div>\n'
     html += '    </div>\n'
     html += '\n'
     html += '    <!-- 分页导航 -->\n'
     html += '    <nav class="mt-5" aria-label="Page navigation">\n'
-    html += '      <ul class="pagination justify-content-center">\n'
-    html += '        <li class="page-item ' + ('disabled' if total_pages <= 1 else '') + '">\n'
-    html += '          <a class="page-link" href="#" id="prev-page" ' + ('tabindex="-1" aria-disabled="true"' if total_pages <= 1 else '') + '>上一页</a>\n'
-    html += '        </li>\n'
-    html += page_numbers_html
-    html += '        <li class="page-item ' + ('disabled' if total_pages <= 1 else '') + '">\n'
-    html += '          <a class="page-link" href="#" id="next-page" ' + ('tabindex="-1" aria-disabled="true"' if total_pages <= 1 else '') + '>下一页</a>\n'
-    html += '        </li>\n'
-    html += '      </ul>\n'
+    html += '      <ul class="pagination justify-content-center" id="pagination"></ul>\n'
     html += '    </nav>\n'
     html += '\n'
     html += '    <div class="text-center mt-3 text-muted">\n'
-    html += '      第 <span id="current-page">1</span> / ' + str(total_pages) + ' 页 <br>每页最多显示 ' + str(PHOTOS_PER_PAGE) + ' 张\n'
+    html += '      第 <span id="current-page">1</span> / <span id="total-pages">1</span> 页 <br>每页最多显示 <span id="per-page">' + str(PHOTOS_PER_PAGE) + '</span> 张\n'
     html += '    </div>\n'
     html += '  </div>\n'
     html += '\n'
@@ -225,79 +232,76 @@ def main():
     html += '</footer>\n'
     html += '\n'
     html += '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>\n'
-    html += '<script>\n'
-    html += '  // 解析URL查询参数获取当前页码\n'
-    html += '  function getCurrentPage() {\n'
-    html += '    const params = new URLSearchParams(window.location.search);\n'
-    html += '    let page = parseInt(params.get("page")) || 1;\n'
-    html += '    const maxPage = ' + str(total_pages) + ';\n'
-    html += '    if (page < 1) page = 1;\n'
-    html += '    if (page > maxPage) page = maxPage;\n'
-    html += '    return page;\n'
-    html += '  }\n'
-    html += '\n'
-    html += '  // 页面加载时显示对应页面的内容\n'
-    html += '  function showPage(page) {\n'
-    html += '    // 隐藏所有页面内容\n'
-    html += '    const allPages = document.querySelectorAll(".photo-page");\n'
-    html += '    allPages.forEach(p => p.style.display = "none");\n'
-    html += '    \n'
-    html += '    // 显示当前页面内容\n'
-    html += '    const currentPageDiv = document.getElementById("page-" + page);\n'
-    html += '    if (currentPageDiv) {\n'
-    html += '      currentPageDiv.style.display = "flex";\n'
-    html += '    }\n'
-    html += '    \n'
-    html += '    // 更新页码显示\n'
-    html += '    document.getElementById("current-page").textContent = page;\n'
-    html += '    \n'
-    html += '    // 更新上一页/下一页按钮\n'
-    html += '    const maxPage = ' + str(total_pages) + ';\n'
-    html += '    const prevBtn = document.getElementById("prev-page");\n'
-    html += '    const nextBtn = document.getElementById("next-page");\n'
-    html += '    \n'
-    html += '    if (page <= 1) {\n'
-    html += '      prevBtn.href = "#";\n'
-    html += '      prevBtn.parentElement.classList.add("disabled");\n'
-    html += '    } else {\n'
-    html += '      prevBtn.href = "?page=" + (page - 1);\n'
-    html += '      prevBtn.parentElement.classList.remove("disabled");\n'
-    html += '    }\n'
-    html += '    \n'
-    html += '    if (page >= maxPage) {\n'
-    html += '      nextBtn.href = "#";\n'
-    html += '      nextBtn.parentElement.classList.add("disabled");\n'
-    html += '    } else {\n'
-    html += '      nextBtn.href = "?page=" + (page + 1);\n'
-    html += '      nextBtn.parentElement.classList.remove("disabled");\n'
-    html += '    }\n'
-    html += '    \n'
-    html += '    // 更新分页按钮样式\n'
-    html += '    const pageItems = document.querySelectorAll(".pagination .page-item");\n'
-    html += '    pageItems.forEach(item => {\n'
-    html += '      const link = item.querySelector("a");\n'
-    html += '      if (link) {\n'
-    html += '        const pageText = link.textContent.trim();\n'
-    html += '        // 只处理数字页码按钮\n'
-    html += '        if (/^\\d+$/.test(pageText)) {\n'
-    html += '          if (parseInt(pageText) === page) {\n'
-    html += '            item.classList.add("active");\n'
-    html += '          } else {\n'
-    html += '            item.classList.remove("active");\n'
-    html += '          }\n'
-    html += '        }\n'
-    html += '      }\n'
-    html += '    });\n'
-    html += '  }\n'
-    html += '\n'
-    html += '  // 初始化\n'
-    html += '  window.addEventListener("load", function() {\n'
-    html += '    const page = getCurrentPage();\n'
-    html += '    showPage(page);\n'
-    html += '  });\n'
-    html += '</script>\n'
-    html += '</body>\n'
-    html += '</html>\n'
+    # 客户端会优先请求 page-{n}.json，若不存在则回退到整体 photos.json
+    script_block = '''<script>
+    (function(){
+        const PER_PAGE = __PER_PAGE__;
+        const TOTAL_PHOTOS = __TOTAL_PHOTOS__;
+        const TOTAL_PAGES = __TOTAL_PAGES__;
+        const PAGE_JSON_DIR = '__PAGE_JSON_DIR__';
+        let photos = [];
+        let observer = null;
+
+        function $(sel){ return document.querySelector(sel); }
+        function getQueryPage(){const p = parseInt(new URLSearchParams(location.search).get('page')) || 1; return Math.max(1,p);}
+        function updateURL(page){const url=new URL(location.href);url.searchParams.set('page',page);history.replaceState(null,'',url);}
+        function formatDate(d){if(!d) return ''; const s=String(d); if(/^\d{8}$/.test(s)) return `${s.slice(0,4)}/${s.slice(4,6)}/${s.slice(6,8)}`; if(/^\d{12}$/.test(s)) return `${s.slice(0,4)}/${s.slice(4,6)}/${s.slice(6,8)}`; return s;}
+
+        function createCard(item){
+            const col=document.createElement('div'); col.className='col';
+            const card=document.createElement('div'); card.className='card h-100';
+            const img=document.createElement('img'); img.className='card-img-top lazy'; img.alt=item.title||''; img.setAttribute('data-src', item.url||''); img.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22%23eee%22/%3E%3C/svg%3E'; img.loading='lazy';
+            const body=document.createElement('div'); body.className='card-body d-flex flex-column';
+            const bodyInner=document.createElement('div'); bodyInner.className='flex-grow-1';
+            const title=document.createElement('h5'); title.className='card-title'; title.textContent=item.title||'';
+            const desc=document.createElement('p'); desc.className='card-text'; desc.textContent=item.copyright||'';
+            bodyInner.appendChild(title); bodyInner.appendChild(desc);
+            const btnGroup=document.createElement('div'); btnGroup.className='btn-group w-100 mt-2'; btnGroup.role='group';
+            const dlGroup=document.createElement('div'); dlGroup.className='btn-group flex-grow-1'; dlGroup.role='group';
+            const dlBtn=document.createElement('button'); dlBtn.type='button'; dlBtn.className='btn btn-sm btn-secondary dropdown-toggle'; dlBtn.setAttribute('data-bs-toggle','dropdown'); dlBtn.textContent='下载图片';
+            const dlMenu=document.createElement('ul'); dlMenu.className='dropdown-menu';
+            const li1080=document.createElement('li'); li1080.innerHTML=`<a class="dropdown-item" href="${item.url}" download>1080p</a>`;
+            const li4k=document.createElement('li'); li4k.innerHTML=`<a class="dropdown-item" href="${(item.urlBase||'')}_UHD.jpg" download>UHD (4K)</a>`;
+            dlMenu.appendChild(li1080); dlMenu.appendChild(li4k); dlGroup.appendChild(dlBtn); dlGroup.appendChild(dlMenu);
+            const viewBtn=document.createElement('a'); viewBtn.className='btn btn-sm btn-primary'; viewBtn.target='_blank'; viewBtn.textContent='在必应中查看'; viewBtn.href=item.copyrightLink||'#';
+            btnGroup.appendChild(dlGroup); btnGroup.appendChild(viewBtn);
+            body.appendChild(bodyInner); body.appendChild(btnGroup);
+            const footer=document.createElement('div'); footer.className='card-footer text-muted'; footer.textContent = formatDate(item.startDate || (item.raw && item.raw.startdate) || item.fullstartdate || '');
+            card.appendChild(img); card.appendChild(body); card.appendChild(footer); col.appendChild(card); return col;
+        }
+
+        function clearGallery(){const g=$('#gallery'); if(g) g.innerHTML='';}
+
+        function renderFromArray(arr, page){
+            clearGallery(); const frag=document.createDocumentFragment(); arr.forEach(it=>frag.appendChild(createCard(it))); $('#gallery').appendChild(frag);
+            document.getElementById('current-page').textContent = page; document.getElementById('total-pages').textContent = TOTAL_PAGES; document.getElementById('per-page').textContent = PER_PAGE; updatePagination(page, TOTAL_PAGES); updateURL(page);
+            if(observer) observer.disconnect(); observer = new IntersectionObserver((entries)=>{ entries.forEach(en=>{ if(en.isIntersecting){ const img=en.target; const src=img.getAttribute('data-src'); if(src){ img.src=src; img.removeAttribute('data-src'); } observer.unobserve(img); } }); }, {rootMargin: '200px'});
+            document.querySelectorAll('img.lazy').forEach(img=>observer.observe(img));
+        }
+
+        function updatePagination(current, total){
+            const container=document.getElementById('pagination'); container.innerHTML=''; const maxButtons=9;
+            function makeItem(label,page,disabled,active){ const li=document.createElement('li'); li.className='page-item'+(disabled?' disabled':'')+(active?' active':''); const a=document.createElement('a'); a.className='page-link'; a.href='?page='+page; a.textContent=label; a.addEventListener('click', function(e){ e.preventDefault(); if(!disabled) loadPage(page); }); li.appendChild(a); return li; }
+            container.appendChild(makeItem('上一页', Math.max(1,current-1), current<=1, false));
+            if(total <= maxButtons){ for(let i=1;i<=total;i++) container.appendChild(makeItem(i,i,false,i===current)); } else { const windowSize = maxButtons - 2; let start = Math.max(2, current - Math.floor(windowSize/2)); let end = start + windowSize -1; if(end >= total){ end = total-1; start = end - windowSize +1; } container.appendChild(makeItem(1,1,false,current===1)); if(start>2) container.appendChild(makeItem('...', start-1, true, false)); for(let i=start;i<=end;i++) container.appendChild(makeItem(i,i,false,i===current)); if(end < total-1) container.appendChild(makeItem('...', end+1, true, false)); container.appendChild(makeItem(total,total,false,current===total)); }
+            container.appendChild(makeItem('下一页', Math.min(total, current+1), current>=total, false));
+        }
+
+        function loadPage(page){
+            const pageJson = `${PAGE_JSON_DIR}/page-${page}.json`;
+            fetch(pageJson, {cache:'no-cache'}).then(r=>{ if(r.ok) return r.json(); throw new Error('no page json'); }).then(arr=>{ renderFromArray(arr, page); }).catch(()=>{ // 回退到整体 photos.json
+                fetch('photos.json', {cache:'no-cache'}).then(r=>r.json()).then(all=>{ const total = Math.ceil(all.length / PER_PAGE) || 1; const p = Math.max(1, Math.min(page, total)); const start=(p-1)*PER_PAGE; renderFromArray(all.slice(start, start+PER_PAGE), p); }).catch(err=>{ document.getElementById('summary').textContent='加载照片数据失败'; console.error(err); });
+            });
+        }
+
+        window.addEventListener('load', function(){
+            document.getElementById('summary').textContent = `已保存来自必应的 ${TOTAL_PHOTOS} 张图片`;
+            loadPage(getQueryPage());
+        });
+    })();
+</script></body></html>'''
+    script_block = script_block.replace('__PER_PAGE__', str(PHOTOS_PER_PAGE)).replace('__TOTAL_PHOTOS__', str(len(photos))).replace('__TOTAL_PAGES__', str(total_pages)).replace('__PAGE_JSON_DIR__', PAGE_JSON_DIR.replace('\\','/'))
+    html += script_block
 
     with open(HTML_FILE, "w", encoding="utf-8") as f:
         f.write(html)
