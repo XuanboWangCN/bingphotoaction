@@ -203,7 +203,7 @@ def main():
     html += '    </nav>\n'
     html += '\n'
     html += '    <div class="text-center mt-3 text-muted">\n'
-    html += '      第 1 / ' + str(total_pages) + ' 页 <br>每页显示 ' + str(PHOTOS_PER_PAGE) + ' 张\n'
+    html += '      第 1 / ' + str(total_pages) + ' 页 <br>每页最多显示 ' + str(PHOTOS_PER_PAGE) + ' 张\n'
     html += '    </div>\n'
     html += '  </div>\n'
     html += '\n'
@@ -270,4 +270,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
