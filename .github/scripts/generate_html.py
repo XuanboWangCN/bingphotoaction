@@ -203,17 +203,17 @@ def main():
     html += '    <nav class="mt-5" aria-label="Page navigation">\n'
     html += '      <ul class="pagination justify-content-center">\n'
     html += '        <li class="page-item ' + ('disabled' if total_pages <= 1 else '') + '">\n'
-    html += '          <a class="page-link" href="?page=1" ' + ('tabindex="-1" aria-disabled="true"' if total_pages <= 1 else '') + '>上一页</a>\n'
+    html += '          <a class="page-link" href="#" id="prev-page" ' + ('tabindex="-1" aria-disabled="true"' if total_pages <= 1 else '') + '>上一页</a>\n'
     html += '        </li>\n'
     html += page_numbers_html
     html += '        <li class="page-item ' + ('disabled' if total_pages <= 1 else '') + '">\n'
-    html += '          <a class="page-link" href="?page=' + str(total_pages) + '" ' + ('tabindex="-1" aria-disabled="true"' if total_pages <= 1 else '') + '>下一页</a>\n'
+    html += '          <a class="page-link" href="#" id="next-page" ' + ('tabindex="-1" aria-disabled="true"' if total_pages <= 1 else '') + '>下一页</a>\n'
     html += '        </li>\n'
     html += '      </ul>\n'
     html += '    </nav>\n'
     html += '\n'
     html += '    <div class="text-center mt-3 text-muted">\n'
-    html += '      第 1 / ' + str(total_pages) + ' 页 <br>每页最多显示 ' + str(PHOTOS_PER_PAGE) + ' 张\n'
+    html += '      第 <span id="current-page">1</span> / ' + str(total_pages) + ' 页 <br>每页最多显示 ' + str(PHOTOS_PER_PAGE) + ' 张\n'
     html += '    </div>\n'
     html += '  </div>\n'
     html += '\n'
@@ -248,6 +248,30 @@ def main():
     html += '      currentPageDiv.style.display = "flex";\n'
     html += '    }\n'
     html += '    \n'
+    html += '    // 更新页码显示\n'
+    html += '    document.getElementById("current-page").textContent = page;\n'
+    html += '    \n'
+    html += '    // 更新上一页/下一页按钮\n'
+    html += '    const maxPage = ' + str(total_pages) + ';\n'
+    html += '    const prevBtn = document.getElementById("prev-page");\n'
+    html += '    const nextBtn = document.getElementById("next-page");\n'
+    html += '    \n'
+    html += '    if (page <= 1) {\n'
+    html += '      prevBtn.href = "#";\n'
+    html += '      prevBtn.parentElement.classList.add("disabled");\n'
+    html += '    } else {\n'
+    html += '      prevBtn.href = "?page=" + (page - 1);\n'
+    html += '      prevBtn.parentElement.classList.remove("disabled");\n'
+    html += '    }\n'
+    html += '    \n'
+    html += '    if (page >= maxPage) {\n'
+    html += '      nextBtn.href = "#";\n'
+    html += '      nextBtn.parentElement.classList.add("disabled");\n'
+    html += '    } else {\n'
+    html += '      nextBtn.href = "?page=" + (page + 1);\n'
+    html += '      nextBtn.parentElement.classList.remove("disabled");\n'
+    html += '    }\n'
+    html += '    \n'
     html += '    // 更新分页按钮样式\n'
     html += '    const pageItems = document.querySelectorAll(".pagination .page-item");\n'
     html += '    pageItems.forEach(item => {\n'
@@ -280,8 +304,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
