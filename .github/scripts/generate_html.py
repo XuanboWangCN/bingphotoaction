@@ -88,7 +88,7 @@ def main():
     html += '<html lang="zh-cn">\n'
     html += '<head>\n'
     html += '  <meta charset="UTF-8">\n'
-    html += '  <title>必应每日一图</title>\n'
+    html += '  <title>必应每日一图相册 by XuanboWang</title>\n'
     html += '  <meta name="viewport" content="width=device-width, initial-scale=1">\n'
     html += '  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">\n'
     html += '  <style>\n'
@@ -182,7 +182,7 @@ def main():
     html += '<body>\n'
     html += '  <div class="container py-4">\n'
     html += '    <div class="page-header mb-4">\n'
-    html += '      <h1>必应每日一图</h1>\n'
+    html += '      <h1>必应每日一图相册</h1>\n'
     html += '    </div>\n'
     html += '    <div class="subtitle">已保存来自必应的 ' + str(len(photos)) + ' 张图片</div>\n'
     html += '    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">\n'
@@ -270,5 +270,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
