@@ -32,8 +32,7 @@ def main():
         end_idx = start_idx + PHOTOS_PER_PAGE
         page_photos = photos[start_idx:end_idx]
         
-        page_html = f'    <div class="photo-page" id="page-{page_num}">\n'
-        page_html += '      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">\n'
+        page_html = f'    <div class="photo-page" id="page-{page_num}" style="display: {"block" if page_num == 1 else "none"};\">\n'
         
         for photo in page_photos:
             date_formatted = format_date(photo.get("startDate", ""))
@@ -42,37 +41,36 @@ def main():
             copyright_link = photo.get("copyrightLink", "#")
             url_base = photo.get("urlBase", "")
             
-            page_html += f"""        <div class="col">
-          <div class="card h-100">
-            <img src="{photo['url']}" class="card-img-top" alt="{title}">
-            <div class="card-body">
-              <h5 class="card-title">{title}</h5>
-              <p class="card-text">{copyright_text}</p>
-              <div class="btn-action-group">
-                <div class="btn-bing-wrapper">
-                  <a href="{copyright_link}" target="_blank" class="btn btn-sm btn-primary">在必应中搜索详情</a>
-                </div>
-                <div class="btn-download-wrapper">
-                  <div class="btn-group w-100" role="group">
-                    <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                      下载图片
-                    </button>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="{get_image_url(url_base, '1080p')}" download>1080p</a></li>
-                      <li><a class="dropdown-item" href="{get_image_url(url_base, 'uhd')}" download>UHD (4K)</a></li>
-                    </ul>
-                  </div>
+            page_html += f"""      <div class="col">
+        <div class="card h-100">
+          <img src="{photo['url']}" class="card-img-top" alt="{title}">
+          <div class="card-body">
+            <h5 class="card-title">{title}</h5>
+            <p class="card-text">{copyright_text}</p>
+            <div class="btn-action-group">
+              <div class="btn-bing-wrapper">
+                <a href="{copyright_link}" target="_blank" class="btn btn-sm btn-primary">在必应中搜索详情</a>
+              </div>
+              <div class="btn-download-wrapper">
+                <div class="btn-group w-100" role="group">
+                  <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    下载图片
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{get_image_url(url_base, '1080p')}" download>1080p</a></li>
+                    <li><a class="dropdown-item" href="{get_image_url(url_base, 'uhd')}" download>UHD (4K)</a></li>
+                  </ul>
                 </div>
               </div>
             </div>
-            <div class="card-footer text-muted">
-              {date_formatted}
-            </div>
+          </div>
+          <div class="card-footer text-muted">
+            {date_formatted}
           </div>
         </div>
+      </div>
 """
         
-        page_html += '      </div>\n'
         page_html += '    </div>\n'
         photos_html_by_page[page_num] = page_html
 
@@ -180,7 +178,7 @@ def main():
   </style>
 </head>
 <body>
-<div class="container py-4">
+  <div class="container py-4">
   <div class="page-header mb-4">
     <h1>必应每日一图</h1>
   </div>
