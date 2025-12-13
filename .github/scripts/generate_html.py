@@ -91,6 +91,7 @@ def main():
     html += '  <title>必应每日一图相册 by XuanboWang</title>\n'
     html += '  <meta name="viewport" content="width=device-width, initial-scale=1">\n'
     html += '  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">\n'
+    html += '  <link rel="icon" href="https://bingphotoaction.pages.dev/favicon.png" type="image/x-icon">\n'
     html += '  <style>\n'
     html += '    .page-header h1 {\n'
     html += '      font-weight: 300;\n'
@@ -270,6 +271,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
