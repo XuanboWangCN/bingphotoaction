@@ -92,6 +92,15 @@ def main():
     html += '  <meta name="viewport" content="width=device-width, initial-scale=1">\n'
     html += '  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">\n'
     html += '  <link rel="icon" href="https://bingphotoaction.pages.dev/favicon.png" type="image/x-icon">\n'
+    html += '  <meta name="description" content="必应每日一图图册 - 每日精选高质量壁纸库，永久保存必应搜索精选图片，支持1080p和4K分辨率免费下载，随时查看历史图片记录，响应式分页浏览，海量高清图片收藏库。">\n'
+    html += '  <meta name="keywords" content="必应图册,每日壁纸,图片库,高清壁纸,4K下载,免费素材,图片收藏,历史图片,历史壁纸,图片记录">\n'
+    html += '  <meta name="author" content="XuanboWang">\n'
+    html += '  <meta property="og:title" content="必应每日一图图册">\n'
+    html += '  <meta property="og:description" content="海量高质量必应精选图片，永久免费图册库，完整历史图片记录，1080p和4K分辨率免费下载">\n'
+    html += '  <meta property="og:type" content="website">\n'
+    html += '  <meta name="twitter:card" content="summary">\n'
+    html += '  <meta name="twitter:title" content="必应每日一图图册">\n'
+    html += '  <meta name="twitter:description" content="精选高清图片图册库，查看完整历史记录，每日更新，免费下载高清壁纸">\n'
     html += '  <style>\n'
     html += '    .page-header h1 {\n'
     html += '      font-weight: 300;\n'
@@ -271,6 +280,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
