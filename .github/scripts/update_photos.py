@@ -4,7 +4,6 @@ from datetime import datetime
 
 PHOTO_JSON = "photo.json"
 PHOTOS_JSON = "photos.json"
-MAX_DAYS = 30
 
 def load_photos():
     if os.path.exists(PHOTOS_JSON):
@@ -37,7 +36,7 @@ def main():
     # 按startDate去重
     photos = [p for p in photos if p.get("startDate") != photo.get("startDate")]
     photos.insert(0, photo)
-    photos = photos[:MAX_DAYS]
+    # 永久保存所有图片（移除MAX_DAYS限制）
     save_photos(photos)
     print(f"Updated photos.json with {len(photos)} photos")
 
