@@ -203,14 +203,14 @@ def main():
     html += '    </nav>\n'
     html += '\n'
     html += '    <div class="text-center mt-3 text-muted">\n'
-    html += '      第 1 / ' + str(total_pages) + ' 页 (每页显示 ' + str(PHOTOS_PER_PAGE) + ' 张)\n'
+    html += '      第 1 / ' + str(total_pages) + ' 页 <br>每页显示 ' + str(PHOTOS_PER_PAGE) + ' 张\n'
     html += '    </div>\n'
     html += '  </div>\n'
     html += '\n'
     html += '<footer>\n'
     html += '  <div class="container text-center">\n'
     html += '    <p>Copyright © <a href="https://github.com/XuanboWangCN" target="_blank">XuanboWang</a> 2025. All rights reserved.<br>\n'
-    html += '    Powered by <a href="https://xuanbo.top" target="_blank">Xuanbo.top</a></p>\n'
+    html += '    Powered by <a href="https://xuanbo.top" target="_blank">Xuanbo.top</a><br>在 Github 中查看源代码：<a href="https://github.com/XuanboWangCN/bingphotoaction/" target="_blank">XuanboWang</a></p>\n'
     html += '  </div>\n'
     html += '</footer>\n'
     html += '\n'
@@ -270,3 +270,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
