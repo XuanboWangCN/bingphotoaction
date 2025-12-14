@@ -202,6 +202,47 @@ def main():
     html += '        flex: 0 0 100%;\n'
     html += '      }\n'
     html += '    }\n'
+    # 添加分页响应式样式
+    html += '    /* 分页响应式样式 */\n'
+    html += '    .pagination-container {\n'
+    html += '      overflow-x: auto;\n'
+    html += '      -webkit-overflow-scrolling: touch;\n'
+    html += '      padding-bottom: 5px;\n'
+    html += '    }\n'
+    html += '    .pagination {\n'
+    html += '      flex-wrap: nowrap;\n'
+    html += '      margin-bottom: 0;\n'
+    html += '    }\n'
+    html += '    .pagination .page-link {\n'
+    html += '      min-width: 40px;\n'
+    html += '      text-align: center;\n'
+    html += '      padding: 0.375rem 0.5rem;\n'
+    html += '      font-size: 0.875rem;\n'
+    html += '    }\n'
+    html += '    @media (max-width: 767.98px) {\n'
+    html += '      .pagination {\n'
+    html += '        flex-wrap: wrap;\n'
+    html += '        justify-content: center;\n'
+    html += '      }\n'
+    html += '      .pagination .page-item {\n'
+    html += '        margin-bottom: 2px;\n'
+    html += '      }\n'
+    html += '      .pagination .page-link {\n'
+    html += '        padding: 0.25rem 0.375rem;\n'
+    html += '        font-size: 0.8125rem;\n'
+    html += '        min-width: 36px;\n'
+    html += '      }\n'
+    html += '    }\n'
+    html += '    /* 跳转页面组件 */\n'
+    html += '    .page-jump-container {\n'
+    html += '      max-width: 300px;\n'
+    html += '      margin: 1.5rem auto;\n'
+    html += '    }\n'
+    html += '    @media (max-width: 767.98px) {\n'
+    html += '      .page-jump-container {\n'
+    html += '        max-width: 250px;\n'
+    html += '      }\n'
+    html += '    }\n'
     html += '  </style>\n'
     html += '</head>\n'
     html += '<body>\n'
@@ -216,8 +257,19 @@ def main():
     html += '\n'
     html += '    <!-- 分页导航 -->\n'
     html += '    <nav class="mt-5" aria-label="Page navigation">\n'
-    html += '      <ul class="pagination justify-content-center" id="pagination"></ul>\n'
+    html += '      <div class="pagination-container">\n'
+    html += '        <ul class="pagination justify-content-center" id="pagination"></ul>\n'
+    html += '      </div>\n'
     html += '    </nav>\n'
+    html += '\n'
+    html += '    <!-- 跳转到页面组件 -->\n'
+    html += '    <div class="page-jump-container">\n'
+    html += '      <div class="input-group input-group-sm">\n'
+    html += '        <span class="input-group-text">转至</span>\n'
+    html += '        <input type="number" id="jumpPageInput" class="form-control" placeholder="页码" min="1" max="' + str(total_pages) + '">\n'
+    html += '        <button class="btn btn-primary" type="button" id="jumpPageBtn">跳转</button>\n'
+    html += '      </div>\n'
+    html += '    </div>\n'
     html += '\n'
     html += '    <div class="text-center mt-3 text-muted">\n'
     html += '      第 <span id="current-page">1</span> / <span id="total-pages">1</span> 页 <br>每页最多显示 <span id="per-page">' + str(PHOTOS_PER_PAGE) + '</span> 张\n'
@@ -243,6 +295,7 @@ def main():
         let observer = null;
 
         function $(sel){ return document.querySelector(sel); }
+        function $$(sel){ return document.querySelectorAll(sel); }
         function getQueryPage(){const p = parseInt(new URLSearchParams(location.search).get('page')) || 1; return Math.max(1,p);}
         function updateURL(page){const url=new URL(location.href);url.searchParams.set('page',page);history.replaceState(null,'',url);}
         function formatDate(d){if(!d) return ''; const s=String(d); if(/^\d{8}$/.test(s)) return `${s.slice(0,4)}/${s.slice(4,6)}/${s.slice(6,8)}`; if(/^\d{12}$/.test(s)) return `${s.slice(0,4)}/${s.slice(4,6)}/${s.slice(6,8)}`; return s;}
@@ -274,29 +327,128 @@ def main():
 
         function renderFromArray(arr, page){
             clearGallery(); const frag=document.createDocumentFragment(); arr.forEach(it=>frag.appendChild(createCard(it))); $('#gallery').appendChild(frag);
-            document.getElementById('current-page').textContent = page; document.getElementById('total-pages').textContent = TOTAL_PAGES; document.getElementById('per-page').textContent = PER_PAGE; updatePagination(page, TOTAL_PAGES); updateURL(page);
-            if(observer) observer.disconnect(); observer = new IntersectionObserver((entries)=>{ entries.forEach(en=>{ if(en.isIntersecting){ const img=en.target; const src=img.getAttribute('data-src'); if(src){ img.src=src; img.removeAttribute('data-src'); } observer.unobserve(img); } }); }, {rootMargin: '200px'});
-            document.querySelectorAll('img.lazy').forEach(img=>observer.observe(img));
+            document.getElementById('current-page').textContent = page; 
+            document.getElementById('total-pages').textContent = TOTAL_PAGES; 
+            document.getElementById('per-page').textContent = PER_PAGE; 
+            updatePagination(page, TOTAL_PAGES); 
+            updateURL(page);
+            updateJumpPageInput(page);
+            if(observer) observer.disconnect(); 
+            observer = new IntersectionObserver((entries)=>{ 
+                entries.forEach(en=>{ 
+                    if(en.isIntersecting){ 
+                        const img=en.target; 
+                        const src=img.getAttribute('data-src'); 
+                        if(src){ 
+                            img.src=src; 
+                            img.removeAttribute('data-src'); 
+                        } 
+                        observer.unobserve(img); 
+                    } 
+                }); 
+            }, {rootMargin: '200px'});
+            $$('img.lazy').forEach(img=>observer.observe(img));
+        }
+
+        function updateJumpPageInput(page) {
+            const input = $('#jumpPageInput');
+            if (input) {
+                input.value = page;
+                input.max = TOTAL_PAGES;
+            }
         }
 
         function updatePagination(current, total){
             const container=document.getElementById('pagination'); container.innerHTML=''; const maxButtons=9;
-            function makeItem(label,page,disabled,active){ const li=document.createElement('li'); li.className='page-item'+(disabled?' disabled':'')+(active?' active':''); const a=document.createElement('a'); a.className='page-link'; a.href='?page='+page; a.textContent=label; a.addEventListener('click', function(e){ e.preventDefault(); if(!disabled) loadPage(page); }); li.appendChild(a); return li; }
+            function makeItem(label,page,disabled,active){ 
+                const li=document.createElement('li'); 
+                li.className='page-item'+(disabled?' disabled':'')+(active?' active':''); 
+                const a=document.createElement('a'); 
+                a.className='page-link'; 
+                a.href='?page='+page; 
+                a.textContent=label; 
+                a.addEventListener('click', function(e){ 
+                    e.preventDefault(); 
+                    if(!disabled) loadPage(page); 
+                }); 
+                li.appendChild(a); 
+                return li; 
+            }
             container.appendChild(makeItem('上一页', Math.max(1,current-1), current<=1, false));
-            if(total <= maxButtons){ for(let i=1;i<=total;i++) container.appendChild(makeItem(i,i,false,i===current)); } else { const windowSize = maxButtons - 2; let start = Math.max(2, current - Math.floor(windowSize/2)); let end = start + windowSize -1; if(end >= total){ end = total-1; start = end - windowSize +1; } container.appendChild(makeItem(1,1,false,current===1)); if(start>2) container.appendChild(makeItem('...', start-1, true, false)); for(let i=start;i<=end;i++) container.appendChild(makeItem(i,i,false,i===current)); if(end < total-1) container.appendChild(makeItem('...', end+1, true, false)); container.appendChild(makeItem(total,total,false,current===total)); }
+            if(total <= maxButtons){ 
+                for(let i=1;i<=total;i++) 
+                    container.appendChild(makeItem(i,i,false,i===current)); 
+            } else { 
+                const windowSize = maxButtons - 2; 
+                let start = Math.max(2, current - Math.floor(windowSize/2)); 
+                let end = start + windowSize -1; 
+                if(end >= total){ 
+                    end = total-1; 
+                    start = end - windowSize +1; 
+                } 
+                container.appendChild(makeItem(1,1,false,current===1)); 
+                if(start>2) container.appendChild(makeItem('...', start-1, true, false)); 
+                for(let i=start;i<=end;i++) 
+                    container.appendChild(makeItem(i,i,false,i===current)); 
+                if(end < total-1) container.appendChild(makeItem('...', end+1, true, false)); 
+                container.appendChild(makeItem(total,total,false,current===total)); 
+            }
             container.appendChild(makeItem('下一页', Math.min(total, current+1), current>=total, false));
         }
 
         function loadPage(page){
+            page = Math.max(1, Math.min(parseInt(page), TOTAL_PAGES));
             const pageJson = `${PAGE_JSON_DIR}/page-${page}.json`;
-            fetch(pageJson, {cache:'no-cache'}).then(r=>{ if(r.ok) return r.json(); throw new Error('no page json'); }).then(arr=>{ renderFromArray(arr, page); }).catch(()=>{ // 回退到整体 photos.json
-                fetch('photos.json', {cache:'no-cache'}).then(r=>r.json()).then(all=>{ const total = Math.ceil(all.length / PER_PAGE) || 1; const p = Math.max(1, Math.min(page, total)); const start=(p-1)*PER_PAGE; renderFromArray(all.slice(start, start+PER_PAGE), p); }).catch(err=>{ document.getElementById('summary').textContent='加载照片数据失败'; console.error(err); });
+            fetch(pageJson, {cache:'no-cache'}).then(r=>{ 
+                if(r.ok) return r.json(); 
+                throw new Error('no page json'); 
+            }).then(arr=>{ 
+                renderFromArray(arr, page); 
+            }).catch(()=>{ // 回退到整体 photos.json
+                fetch('photos.json', {cache:'no-cache'}).then(r=>r.json()).then(all=>{ 
+                    const total = Math.ceil(all.length / PER_PAGE) || 1; 
+                    const p = Math.max(1, Math.min(page, total)); 
+                    const start=(p-1)*PER_PAGE; 
+                    renderFromArray(all.slice(start, start+PER_PAGE), p); 
+                }).catch(err=>{ 
+                    document.getElementById('summary').textContent='加载照片数据失败'; 
+                    console.error(err); 
+                });
             });
         }
 
+        function initJumpPage() {
+            const jumpBtn = $('#jumpPageBtn');
+            const jumpInput = $('#jumpPageInput');
+            
+            if (jumpBtn && jumpInput) {
+                // 按钮点击事件
+                jumpBtn.addEventListener('click', function() {
+                    const page = parseInt(jumpInput.value);
+                    if (page >= 1 && page <= TOTAL_PAGES) {
+                        loadPage(page);
+                    } else {
+                        alert('请输入有效的页码 (1-' + TOTAL_PAGES + ')');
+                        jumpInput.focus();
+                    }
+                });
+                
+                // 输入框回车事件
+                jumpInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        jumpBtn.click();
+                    }
+                });
+            }
+        }
+
         window.addEventListener('load', function(){
+            // 控制台美化输出
+            console.log('%c必应每日一图相册 - Github项目地址：https://github.com/XuanboWangCN/bingphotoaction  \\n知识共享署名协议 4.0 国际版本（CC-BY 4.0）\\n© 2025 XuanboWang（ https://github.com/XuanboWangCN ）. All rights reserved.', 'background: #222; color: #bada55; font-size: 12px; padding: 5px; border-radius: 3px;');
+            
             document.getElementById('summary').textContent = `已保存来自必应的 ${TOTAL_PHOTOS} 张图片`;
             loadPage(getQueryPage());
+            initJumpPage();
         });
     })();
 </script></body></html>'''
@@ -308,5 +460,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
