@@ -205,7 +205,7 @@ def main():
     # 添加分页响应式样式
     html += '    /* 分页响应式样式 */\n'
     html += '    .pagination-container {\n'
-    html += '      overflow-x: auto;\n'
+    html += '    /*  overflow-x: auto;*/\n'
     html += '      -webkit-overflow-scrolling: touch;\n'
     html += '      padding-bottom: 5px;\n'
     html += '    }\n'
@@ -460,3 +460,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
