@@ -141,6 +141,34 @@
         max-width: 250px;
       }
     }
+    /* 新增样式：标题区域布局 */
+    .title-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 0rem;
+    }
+    .subtitle-container {
+      flex: 1;
+      min-width: 0;
+    }
+    .api-link-container {
+      margin-left: 1rem;
+      display: flex;
+      align-items: center;
+    }
+    /* 移动端适配 */
+    @media (max-width: 767.98px) {
+      .title-area {
+        align-items: flex-start;
+      }
+      .api-link-container {
+        margin-left: 0;
+        margin-top: 0.5rem;
+        align-self: flex-start;
+      }
+    }
   </style>
 </head>
 <body>
@@ -148,7 +176,17 @@
     <div class="page-header mb-4">
       <h1>必应每日一图相册</h1>
     </div>
-    <div class="subtitle" id="summary">正在加载照片信息…</div>
+    <!-- 修改这里：将 subtitle 和 API 链接放在同一个容器中 -->
+    <div class="title-area">
+      <div class="subtitle-container">
+        <div class="subtitle" id="summary">正在加载照片信息…</div>
+      </div>
+      <div class="api-link-container">
+        <a href="https://bphoto.xuanbo.top/api/" class="btn btn-outline-primary btn-sm" target="_blank" rel="noopener">
+          API
+        </a>
+      </div>
+    </div>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
       <div id="gallery" class="photo-page"></div>
     </div>

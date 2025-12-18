@@ -243,6 +243,35 @@ def main():
     html += '        max-width: 250px;\n'
     html += '      }\n'
     html += '    }\n'
+    # 新增样式：标题区域布局
+    html += '    /* 新增样式：标题区域布局 */\n'
+    html += '    .title-area {\n'
+    html += '      display: flex;\n'
+    html += '      justify-content: space-between;\n'
+    html += '      align-items: flex-start;\n'
+    html += '      flex-wrap: wrap;\n'
+    html += '      margin-bottom: 0rem;\n'
+    html += '    }\n'
+    html += '    .subtitle-container {\n'
+    html += '      flex: 1;\n'
+    html += '      min-width: 0;\n'
+    html += '    }\n'
+    html += '    .api-link-container {\n'
+    html += '      margin-left: 1rem;\n'
+    html += '      display: flex;\n'
+    html += '      align-items: center;\n'
+    html += '    }\n'
+    html += '    /* 移动端适配 */\n'
+    html += '    @media (max-width: 767.98px) {\n'
+    html += '      .title-area {\n'
+    html += '        align-items: flex-start;\n'
+    html += '      }\n'
+    html += '      .api-link-container {\n'
+    html += '        margin-left: 0;\n'
+    html += '        margin-top: 0.5rem;\n'
+    html += '        align-self: flex-start;\n'
+    html += '      }\n'
+    html += '    }\n'
     html += '  </style>\n'
     html += '</head>\n'
     html += '<body>\n'
@@ -250,7 +279,20 @@ def main():
     html += '    <div class="page-header mb-4">\n'
     html += '      <h1>必应每日一图相册</h1>\n'
     html += '    </div>\n'
-    html += '    <div class="subtitle" id="summary">正在加载照片信息…</div>\n'
+    
+    # 修改这里：将 subtitle 和 API 链接放在同一个容器中
+    html += '    <!-- 修改这里：将 subtitle 和 API 链接放在同一个容器中 -->\n'
+    html += '    <div class="title-area">\n'
+    html += '      <div class="subtitle-container">\n'
+    html += '        <div class="subtitle" id="summary">正在加载照片信息…</div>\n'
+    html += '      </div>\n'
+    html += '      <div class="api-link-container">\n'
+    html += '        <a href="https://bphoto.xuanbo.top/api/" class="btn btn-outline-primary btn-sm" target="_blank" rel="noopener">\n'
+    html += '          API\n'
+    html += '        </a>\n'
+    html += '      </div>\n'
+    html += '    </div>\n'
+    
     html += '    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">\n'
     html += '      <div id="gallery" class="photo-page"></div>\n'
     html += '    </div>\n'
@@ -460,5 +502,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
