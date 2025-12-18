@@ -326,6 +326,7 @@ def main():
     html += '</footer>\n'
     html += '\n'
     html += '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>\n'
+    html += '<script src="https://xuanbo.top/assets/howmanyarevisitors.js" defer></script>\n'
     # 客户端会优先请求 page-{n}.json，若不存在则回退到整体 photos.json
     script_block = '''<script>
     (function(){
@@ -501,4 +502,5 @@ def main():
         f.write(html)
 
 if __name__ == "__main__":
+
     main()
